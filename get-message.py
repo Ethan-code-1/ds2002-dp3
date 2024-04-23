@@ -29,7 +29,7 @@ def get_message():
 
             #WaitTimeSeoncds added to ensure message do not return blank incase some network lag
             response = sqs.receive_message(
-                WaitTimeSeconds = 5, 
+                WaitTimeSeconds = 3, 
                 QueueUrl=url,
                 AttributeNames=[
                     'All'
