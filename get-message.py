@@ -27,9 +27,9 @@ def get_message():
         #Was done because on queues less than a 1,000 items you sometimes may not get all items back in one request even when asking for 10: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html
         while(len(myMessageStorage) != 10): 
 
-            #WaitTimeSeoncds added to ensure message do not return blank 
+            #WaitTimeSeoncds added to ensure message do not return blank incase some network lag
             response = sqs.receive_message(
-                WaitTimeSeconds = 19, 
+                WaitTimeSeconds = 3, 
                 QueueUrl=url,
                 AttributeNames=[
                     'All'
