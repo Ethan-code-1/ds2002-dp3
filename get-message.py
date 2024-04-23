@@ -6,6 +6,8 @@ import json
 # Set up your SQS queue URL and boto3 client
 url = "https://sqs.us-east-1.amazonaws.com/440848399208/ebo4dq"
 sqs = boto3.client('sqs')
+
+#My gloabl vars
 myMessageStorage = {}
 
 def delete_message(handle):
@@ -22,9 +24,10 @@ def delete_message(handle):
 def get_message():
     try:
         #Fetch messages until the message storage has a length of 10
-        #Was done because on queues less than a 1,000 items you sometimes may not get all items back in one: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html
+        #Was done because on queues less than a 1,000 items you sometimes may not get all items back in one request even when asking for 10: https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_ReceiveMessage.html
         while(len(myMessageStorage) != 10): 
 
+            #WaitTimeSeoncds added to ensure message do not return blank 
             response = sqs.receive_message(
                 WaitTimeSeconds = 19, 
                 QueueUrl=url,
@@ -35,7 +38,6 @@ def get_message():
                 MessageAttributeNames=[
                     'All'
                 ], 
-                VisibilityTimeout = 50
             )
 
             # Check if there is a message in the queue or not
@@ -43,7 +45,7 @@ def get_message():
 
                 numberOfMessages = len(response['Messages'])
 
-                print("There are: " , numberOfMessages)
+                #print("There are: " , numberOfMessages)
 
                 for i in range(0, numberOfMessages):
                     
@@ -52,6 +54,7 @@ def get_message():
                     handle = response['Messages'][i]['ReceiptHandle']
 
                     myMessageStorage[order] = word 
+                    delete_message(handle)
           
             # If there is no message in the queue, print a message and exit    
             else:
@@ -66,7 +69,7 @@ def get_message():
             if i != 9:
                 hiddenMessage += ' '
 
-
+        print("The secret phrase is: ")
         print(hiddenMessage)
             
     # Handle any errors that may occur connecting to SQS
